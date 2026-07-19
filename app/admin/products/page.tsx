@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db/client";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default async function AdminProductsPage() {
@@ -10,7 +12,12 @@ export default async function AdminProductsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold tracking-tight">Products</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight">Products</h1>
+        <Button size="sm" nativeButton={false} render={<Link href="/admin/products/new" />}>
+          New product
+        </Button>
+      </div>
 
       <div className="mt-6 rounded-lg border border-border/60">
         <Table>
@@ -25,7 +32,11 @@ export default async function AdminProductsPage() {
           <TableBody>
             {products.map((product) => (
               <TableRow key={product.id}>
-                <TableCell className="font-medium">{product.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Link href={`/admin/products/${product.id}`} className="hover:underline">
+                    {product.name}
+                  </Link>
+                </TableCell>
                 <TableCell className="text-muted-foreground">{product.category.name}</TableCell>
                 <TableCell className="text-muted-foreground">{product.variants.length}</TableCell>
                 <TableCell>
