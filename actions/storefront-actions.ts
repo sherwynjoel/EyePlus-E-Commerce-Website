@@ -91,13 +91,15 @@ export async function addAddressAction(formData: FormData): Promise<void> {
 export async function placeOrderAction(formData: FormData): Promise<void> {
   await requireUser();
   const addressId = String(formData.get("addressId") ?? "");
+  const couponCode = String(formData.get("couponCode") ?? "").trim();
 
   let order;
   try {
-    order = await createOrderFromCart(addressId);
+    order = await createOrderFromCart(addressId, couponCode || undefined);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not place order.";
-    redirect(`/checkout?error=${encodeURIComponent(message)}`);
+    const couponParam = couponCode ? `&coupon=${encodeURIComponent(couponCode)}` : "";
+    redirect(`/checkout?error=${encodeURIComponent(message)}${couponParam}`);
   }
 
   const amountPaise = Math.round(Number(order.grandTotal) * 100);

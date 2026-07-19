@@ -4,13 +4,14 @@ import { getErpAdapter } from "@/lib/erp";
 import { notify } from "@/lib/sms/notification-service";
 import { checkPincodeServiceability } from "@/lib/services/delivery-service";
 import { getAddressForCurrentUser } from "@/lib/services/address-service";
+import { validateAndComputeCoupon } from "@/lib/services/coupon-service";
 import type { OrderStatus } from "@/lib/generated/prisma/client";
 
 function generateOrderNumber(): string {
   return `EYP-${Date.now().toString(36).toUpperCase()}`;
 }
 
-export async function createOrderFromCart(addressId: string) {
+export async function createOrderFromCart(addressId: string, couponCode?: string) {
   const session = await requireUser();
 
   const address = await getAddressForCurrentUser(addressId);
@@ -31,7 +32,19 @@ export async function createOrderFromCart(addressId: string) {
   }
 
   const subtotal = cart.items.reduce((sum, item) => sum + Number(item.priceSnapshot) * item.quantity, 0);
-  const grandTotal = subtotal;
+
+  let discountTotal = 0;
+  let couponId: string | undefined;
+  if (couponCode) {
+    const result = await validateAndComputeCoupon(couponCode, session.userId, subtotal);
+    if (!result.valid) {
+      throw new Error(result.reason ?? "This coupon can't be applied.");
+    }
+    discountTotal = result.discountAmount ?? 0;
+    couponId = result.couponId;
+  }
+
+  const grandTotal = subtotal - discountTotal;
 
   const order = await prisma.order.create({
     data: {
@@ -41,7 +54,9 @@ export async function createOrderFromCart(addressId: string) {
       shippingAddressId: address.id,
       billingAddressId: address.id,
       subtotal,
+      discountTotal,
       grandTotal,
+      couponId,
       items: {
         create: cart.items.map((item) => ({
           variantId: item.variantId,
@@ -61,6 +76,12 @@ export async function createOrderFromCart(addressId: string) {
     include: { items: true, payment: true },
   });
 
+  if (couponId) {
+    await prisma.couponRedemption.create({
+      data: { couponId, userId: session.userId, orderId: order.id },
+    });
+  }
+
   return order;
 }
 
@@ -72,6 +93,7 @@ const ORDER_DETAIL_INCLUDE = {
   shippingAddress: true,
   billingAddress: true,
   user: true,
+  coupon: true,
 };
 
 export async function getOrderForCurrentUser(orderId: string) {

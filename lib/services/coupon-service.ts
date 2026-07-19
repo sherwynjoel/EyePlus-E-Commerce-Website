@@ -61,6 +61,7 @@ export interface CouponValidationResult {
   valid: boolean;
   reason?: string;
   discountAmount?: number;
+  couponId?: string;
 }
 
 export async function validateAndComputeCoupon(
@@ -93,5 +94,5 @@ export async function validateAndComputeCoupon(
   if (coupon.maxDiscount) discountAmount = Math.min(discountAmount, Number(coupon.maxDiscount));
   discountAmount = Math.min(discountAmount, subtotal);
 
-  return { valid: true, discountAmount: Math.round(discountAmount) };
+  return { valid: true, discountAmount: Math.round(discountAmount), couponId: coupon.id };
 }

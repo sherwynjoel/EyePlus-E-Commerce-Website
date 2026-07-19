@@ -83,8 +83,21 @@ export default async function AdminOrderDetailPage({
               ))}
             </TableBody>
           </Table>
-          <div className="mt-4 flex justify-end text-sm font-semibold">
-            Total: {formatInr(order.grandTotal.toString())}
+          <div className="mt-4 space-y-1 text-right text-sm">
+            <div className="flex justify-end gap-4">
+              <span className="text-muted-foreground">Subtotal</span>
+              <span className="w-28">{formatInr(order.subtotal.toString())}</span>
+            </div>
+            {order.coupon ? (
+              <div className="flex justify-end gap-4 text-emerald-600 dark:text-emerald-500">
+                <span>Coupon {order.coupon.code}</span>
+                <span className="w-28">-{formatInr(order.discountTotal.toString())}</span>
+              </div>
+            ) : null}
+            <div className="flex justify-end gap-4 font-semibold">
+              <span>Total</span>
+              <span className="w-28">{formatInr(order.grandTotal.toString())}</span>
+            </div>
           </div>
         </CardContent>
       </Card>

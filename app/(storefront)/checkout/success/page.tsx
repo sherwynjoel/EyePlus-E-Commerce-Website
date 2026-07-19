@@ -22,6 +22,12 @@ export default async function CheckoutSuccessPage({
             Order <span className="font-medium text-foreground">{order.orderNumber}</span> for{" "}
             <span className="font-medium text-foreground">{formatInr(order.grandTotal.toString())}</span> has been placed.
           </p>
+          {order.coupon ? (
+            <p className="text-xs text-muted-foreground">
+              Coupon <span className="font-medium">{order.coupon.code}</span> saved you{" "}
+              {formatInr(order.discountTotal.toString())}.
+            </p>
+          ) : null}
           <p className="text-xs text-muted-foreground">
             A confirmation has been sent to your phone. You can track this order from your account.
           </p>

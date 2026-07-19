@@ -8,14 +8,16 @@ import { AddressForm } from "@/components/storefront/address-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { formatInr } from "@/lib/utils/currency";
 
 export default async function CheckoutPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; coupon?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, coupon } = await searchParams;
   const session = await getSession();
   if (!session) redirect("/auth/login?next=/checkout");
 
@@ -109,13 +111,21 @@ export default async function CheckoutPage({
                   ))}
                 </div>
                 <div className="flex items-center justify-between border-t border-border/60 pt-4 text-sm">
-                  <span className="text-muted-foreground">Total</span>
+                  <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-semibold">{formatInr(subtotal)}</span>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="couponCode">Coupon code (optional)</Label>
+                  <Input id="couponCode" name="couponCode" defaultValue={coupon ?? ""} placeholder="e.g. WELCOME10" className="uppercase" />
                 </div>
 
                 <Button type="submit" className="w-full" size="lg" disabled={!anyDeliverable}>
                   Place order
                 </Button>
+                <p className="text-xs text-muted-foreground">
+                  The final total (after any coupon discount) is shown on the payment page.
+                </p>
               </CardContent>
             </Card>
           </div>
