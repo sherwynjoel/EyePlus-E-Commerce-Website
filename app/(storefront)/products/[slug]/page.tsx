@@ -40,6 +40,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       mrp: price ? Number(price.mrp) : null,
       quantityAvailable,
       inWishlist: wishlistVariantIds.has(variant.id),
+      imageUrl: (variant.imageUrls as string[] | undefined)?.[0],
     };
   });
 

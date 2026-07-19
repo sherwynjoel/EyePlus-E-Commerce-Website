@@ -14,6 +14,7 @@ export interface VariantFormValues {
   attributeLabel: string;
   attributeValue: string;
   quantityOnHand: number;
+  imageUrl?: string;
   retail?: PriceValue;
   dealerBronze?: PriceValue;
   dealerSilver?: PriceValue;
@@ -48,6 +49,17 @@ export function VariantForm({ productId, variant }: { productId: string; variant
           <Label htmlFor={`attributeValue-${variant?.id ?? "new"}`}>Value (e.g. 55 inch)</Label>
           <Input id={`attributeValue-${variant?.id ?? "new"}`} name="attributeValue" defaultValue={variant?.attributeValue} required />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={`imageUrl-${variant?.id ?? "new"}`}>Image URL (optional)</Label>
+        <Input
+          id={`imageUrl-${variant?.id ?? "new"}`}
+          name="imageUrl"
+          type="url"
+          placeholder="https://…"
+          defaultValue={variant?.imageUrl ?? ""}
+        />
       </div>
 
       <div className="rounded-md border border-border/60">

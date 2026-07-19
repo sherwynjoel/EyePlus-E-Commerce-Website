@@ -40,12 +40,15 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             const [attributeLabel, attributeValue] = Object.entries(attributes)[0] ?? ["size", ""];
             const quantityOnHand = variant.inventory.find((inv) => inv.warehouseCode === "MAIN")?.quantityOnHand ?? 0;
 
+            const imageUrls = (variant.imageUrls as string[]) ?? [];
+
             const values: VariantFormValues = {
               id: variant.id,
               sku: variant.sku,
               attributeLabel,
               attributeValue,
               quantityOnHand,
+              imageUrl: imageUrls[0],
               retail: priceFor(variant.prices, "RETAIL"),
               dealerBronze: priceFor(variant.prices, "DEALER_BRONZE"),
               dealerSilver: priceFor(variant.prices, "DEALER_SILVER"),

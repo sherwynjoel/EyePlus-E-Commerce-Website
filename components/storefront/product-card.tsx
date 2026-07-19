@@ -11,6 +11,7 @@ export interface ProductCardData {
   categoryName: string;
   fromPrice: number | null;
   mrp: number | null;
+  imageUrl?: string;
 }
 
 export function ProductCard({ product }: { product: ProductCardData }) {
@@ -20,7 +21,14 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     <Link href={`/products/${product.slug}`} className="group">
       <Card className="h-full overflow-hidden py-0 transition-shadow hover:shadow-md">
         <div className="flex aspect-square items-center justify-center bg-muted/50">
-          <Tv className="size-16 text-muted-foreground/40" strokeWidth={1} />
+          {product.imageUrl ? (
+            // Admin-entered external URLs aren't known ahead of time, so this
+            // intentionally bypasses next/image's remote-domain allowlist.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={product.imageUrl} alt={product.name} className="size-full object-cover" />
+          ) : (
+            <Tv className="size-16 text-muted-foreground/40" strokeWidth={1} />
+          )}
         </div>
         <CardContent className="space-y-1 px-4 pt-4">
           <p className="text-xs text-muted-foreground">{product.brand ?? product.categoryName}</p>

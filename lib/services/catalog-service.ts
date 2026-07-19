@@ -114,6 +114,7 @@ export interface VariantInput {
   sku: string;
   attributeLabel: string;
   attributeValue: string;
+  imageUrl?: string;
   mrpRetail: number;
   sellingPriceRetail: number;
   mrpDealerBronze?: number;
@@ -163,6 +164,7 @@ export async function createVariant(productId: string, input: VariantInput) {
       sku: input.sku,
       attributes: { [input.attributeLabel]: input.attributeValue },
       erpItemCode: input.sku,
+      imageUrls: input.imageUrl ? [input.imageUrl] : [],
     },
   });
 
@@ -188,7 +190,11 @@ export async function updateVariant(variantId: string, input: VariantInput) {
 
   await prisma.productVariant.update({
     where: { id: variantId },
-    data: { sku: input.sku, attributes: { [input.attributeLabel]: input.attributeValue } },
+    data: {
+      sku: input.sku,
+      attributes: { [input.attributeLabel]: input.attributeValue },
+      imageUrls: input.imageUrl ? [input.imageUrl] : [],
+    },
   });
 
   const prices = pricesFromInput(input);

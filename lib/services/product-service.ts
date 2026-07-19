@@ -36,19 +36,23 @@ export async function listProducts(options: {
   });
 
   return products.map((product) => {
-    const variantPrices = product.variants
-      .map((v) => v.prices[0])
-      .filter((p): p is NonNullable<typeof p> => Boolean(p));
+    const variantsWithPrice = product.variants
+      .map((v) => ({ variant: v, price: v.prices[0] }))
+      .filter((v): v is { variant: (typeof product.variants)[number]; price: NonNullable<typeof v.price> } =>
+        Boolean(v.price),
+      );
 
-    const cheapest = variantPrices.sort((a, b) => Number(a.sellingPrice) - Number(b.sellingPrice))[0];
+    const cheapest = variantsWithPrice.sort((a, b) => Number(a.price.sellingPrice) - Number(b.price.sellingPrice))[0];
+    const imageUrl = (cheapest?.variant.imageUrls as string[] | undefined)?.[0];
 
     return {
       slug: product.slug,
       name: product.name,
       brand: product.brand,
       categoryName: product.category.name,
-      fromPrice: cheapest ? Number(cheapest.sellingPrice) : null,
-      mrp: cheapest ? Number(cheapest.mrp) : null,
+      fromPrice: cheapest ? Number(cheapest.price.sellingPrice) : null,
+      mrp: cheapest ? Number(cheapest.price.mrp) : null,
+      imageUrl,
     };
   });
 }

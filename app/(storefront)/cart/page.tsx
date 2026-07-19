@@ -48,11 +48,17 @@ export default async function CartPage() {
             {items.map((item) => {
               const attributes = (item.variant.attributes as Record<string, string>) ?? {};
               const label = Object.values(attributes)[0];
+              const imageUrl = (item.variant.imageUrls as string[] | undefined)?.[0];
               return (
                 <Card key={item.id}>
                   <CardContent className="flex items-center gap-4 py-4">
-                    <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-muted/50">
-                      <Tv className="size-8 text-muted-foreground/40" strokeWidth={1} />
+                    <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted/50">
+                      {imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={imageUrl} alt={item.variant.product.name} className="size-full object-cover" />
+                      ) : (
+                        <Tv className="size-8 text-muted-foreground/40" strokeWidth={1} />
+                      )}
                     </div>
                     <div className="flex-1">
                       <Link href={`/products/${item.variant.product.slug}`} className="font-medium hover:underline">

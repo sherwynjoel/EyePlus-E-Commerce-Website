@@ -17,6 +17,7 @@ export interface ProductDetailVariant {
   mrp: number | null;
   quantityAvailable: number;
   inWishlist: boolean;
+  imageUrl?: string;
 }
 
 export function ProductDetail({
@@ -46,8 +47,13 @@ export function ProductDetail({
 
   return (
     <div className="grid gap-10 lg:grid-cols-2">
-      <div className="flex aspect-square items-center justify-center rounded-xl bg-muted/50">
-        <Tv className="size-32 text-muted-foreground/40" strokeWidth={1} />
+      <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-muted/50">
+        {selected?.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={selected.imageUrl} alt={name} className="size-full object-cover" />
+        ) : (
+          <Tv className="size-32 text-muted-foreground/40" strokeWidth={1} />
+        )}
       </div>
 
       <div>

@@ -28,16 +28,22 @@ const SAMPLE_PRODUCTS: {
   brand: string;
   basePrice: number;
   sizes: string[];
+  color: string;
 }[] = [
-  { categorySlug: "tvs", name: "Crestline 4K UHD Smart TV", brand: "Crestline", basePrice: 34999, sizes: ["43 inch", "55 inch", "65 inch"] },
-  { categorySlug: "tvs", name: "Crestline QLED Pro TV", brand: "Crestline", basePrice: 54999, sizes: ["55 inch", "65 inch"] },
-  { categorySlug: "panels", name: "Vertex Interactive Flat Panel", brand: "Vertex", basePrice: 89999, sizes: ["65 inch", "75 inch"] },
-  { categorySlug: "kiosks", name: "Vertex Self-Service Kiosk", brand: "Vertex", basePrice: 124999, sizes: ["32 inch"] },
-  { categorySlug: "signage", name: "Vertex Digital Signage Display", brand: "Vertex", basePrice: 45999, sizes: ["43 inch", "55 inch"] },
-  { categorySlug: "tablets", name: "Crestline Tab 11", brand: "Crestline", basePrice: 18999, sizes: ["64GB", "128GB"] },
-  { categorySlug: "laptops", name: "Crestline Book Air 14", brand: "Crestline", basePrice: 52999, sizes: ["256GB", "512GB"] },
-  { categorySlug: "desktops", name: "Vertex Compact Desktop", brand: "Vertex", basePrice: 39999, sizes: ["512GB SSD"] },
+  { categorySlug: "tvs", name: "Crestline 4K UHD Smart TV", brand: "Crestline", basePrice: 34999, sizes: ["43 inch", "55 inch", "65 inch"], color: "1e3a5f" },
+  { categorySlug: "tvs", name: "Crestline QLED Pro TV", brand: "Crestline", basePrice: 54999, sizes: ["55 inch", "65 inch"], color: "1e3a5f" },
+  { categorySlug: "panels", name: "Vertex Interactive Flat Panel", brand: "Vertex", basePrice: 89999, sizes: ["65 inch", "75 inch"], color: "3f2e5c" },
+  { categorySlug: "kiosks", name: "Vertex Self-Service Kiosk", brand: "Vertex", basePrice: 124999, sizes: ["32 inch"], color: "3f2e5c" },
+  { categorySlug: "signage", name: "Vertex Digital Signage Display", brand: "Vertex", basePrice: 45999, sizes: ["43 inch", "55 inch"], color: "3f2e5c" },
+  { categorySlug: "tablets", name: "Crestline Tab 11", brand: "Crestline", basePrice: 18999, sizes: ["64GB", "128GB"], color: "1a4d3a" },
+  { categorySlug: "laptops", name: "Crestline Book Air 14", brand: "Crestline", basePrice: 52999, sizes: ["256GB", "512GB"], color: "1a4d3a" },
+  { categorySlug: "desktops", name: "Vertex Compact Desktop", brand: "Vertex", basePrice: 39999, sizes: ["512GB SSD"], color: "5c3a1e" },
 ];
+
+function placeholderImageUrl(name: string, color: string): string {
+  const text = encodeURIComponent(name);
+  return `https://placehold.co/600x600/${color}/f5f5f0?text=${text}&font=roboto`;
+}
 
 const PINCODES = [
   { pincode: "641001", city: "Coimbatore", state: "Tamil Nadu", serviceable: true, codAvailable: true, estimatedDays: 2 },
@@ -94,16 +100,19 @@ async function main() {
       },
     });
 
+    const imageUrl = placeholderImageUrl(item.name, item.color);
+
     for (const size of item.sizes) {
       const sku = `${erpItemCode}-${slugify(size).toUpperCase()}`;
       const variant = await prisma.productVariant.upsert({
         where: { sku },
-        update: {},
+        update: { imageUrls: [imageUrl] },
         create: {
           productId: product.id,
           sku,
           attributes: { size },
           erpItemCode: sku,
+          imageUrls: [imageUrl],
         },
       });
 
