@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "@/components/storefront/product-card";
 import { listCategories, listProducts } from "@/lib/services/product-service";
+import { resolveViewerPriceListCode } from "@/lib/services/pricing-service";
 
 export default async function ProductsPage({
   searchParams,
@@ -9,9 +10,10 @@ export default async function ProductsPage({
   searchParams: Promise<{ category?: string }>;
 }) {
   const { category } = await searchParams;
+  const priceListCode = await resolveViewerPriceListCode();
   const [categories, products] = await Promise.all([
     listCategories(),
-    listProducts({ categorySlug: category }),
+    listProducts({ categorySlug: category, priceListCode }),
   ]);
 
   return (

@@ -2,9 +2,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/storefront/product-card";
 import { listCategories, listProducts } from "@/lib/services/product-service";
+import { resolveViewerPriceListCode } from "@/lib/services/pricing-service";
 
 export default async function HomePage() {
-  const [categories, products] = await Promise.all([listCategories(), listProducts()]);
+  const priceListCode = await resolveViewerPriceListCode();
+  const [categories, products] = await Promise.all([listCategories(), listProducts({ priceListCode })]);
 
   return (
     <div>
