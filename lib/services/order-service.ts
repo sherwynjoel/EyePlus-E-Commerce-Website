@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/db/client";
-import { requireUser } from "@/lib/auth/rbac";
+import { requireUser, requireRole } from "@/lib/auth/rbac";
 import { getErpAdapter } from "@/lib/erp";
 import { notify } from "@/lib/sms/notification-service";
 import { checkPincodeServiceability } from "@/lib/services/delivery-service";
 import { getAddressForCurrentUser } from "@/lib/services/address-service";
+import type { OrderStatus } from "@/lib/generated/prisma/client";
 
 function generateOrderNumber(): string {
   return `EYP-${Date.now().toString(36).toUpperCase()}`;
@@ -63,14 +64,99 @@ export async function createOrderFromCart(addressId: string) {
   return order;
 }
 
+const ORDER_DETAIL_INCLUDE = {
+  items: { include: { returnRequests: true } },
+  payment: true,
+  statusHistory: { orderBy: { changedAt: "asc" as const } },
+  deliveryAssignment: { include: { staff: true } },
+  shippingAddress: true,
+  billingAddress: true,
+  user: true,
+};
+
 export async function getOrderForCurrentUser(orderId: string) {
   const session = await requireUser();
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    include: { items: true, payment: true },
+    include: ORDER_DETAIL_INCLUDE,
   });
   if (!order || order.userId !== session.userId) return null;
   return order;
+}
+
+export async function getOrderForAdmin(orderId: string) {
+  await requireRole(["ADMIN", "STAFF"]);
+  return prisma.order.findUnique({
+    where: { id: orderId },
+    include: ORDER_DETAIL_INCLUDE,
+  });
+}
+
+const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  PENDING: ["CANCELLED"],
+  CONFIRMED: ["PACKED", "CANCELLED"],
+  PACKED: ["SHIPPED", "CANCELLED"],
+  SHIPPED: ["OUT_FOR_DELIVERY"],
+  OUT_FOR_DELIVERY: ["DELIVERED"],
+  DELIVERED: [],
+  CANCELLED: [],
+  RETURN_REQUESTED: [],
+  RETURNED: [],
+  REFUNDED: [],
+};
+
+const STATUS_SMS_TEMPLATE = {
+  SHIPPED: "ORDER_SHIPPED",
+  OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
+  DELIVERED: "DELIVERED",
+} as const;
+
+export function getValidNextStatuses(status: OrderStatus): OrderStatus[] {
+  return ORDER_STATUS_TRANSITIONS[status];
+}
+
+export async function transitionOrderStatus(orderId: string, newStatus: OrderStatus, note?: string) {
+  const session = await requireRole(["ADMIN", "STAFF"]);
+  const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId }, include: { user: true } });
+
+  const allowed = ORDER_STATUS_TRANSITIONS[order.status];
+  if (!allowed.includes(newStatus)) {
+    throw new Error(`Cannot move an order from ${order.status} to ${newStatus}.`);
+  }
+
+  await prisma.$transaction([
+    prisma.order.update({ where: { id: orderId }, data: { status: newStatus } }),
+    prisma.orderStatusHistory.create({
+      data: { orderId, status: newStatus, note, changedByUserId: session.userId },
+    }),
+  ]);
+
+  const template = STATUS_SMS_TEMPLATE[newStatus as keyof typeof STATUS_SMS_TEMPLATE];
+  if (template) {
+    await notify(order.user.phone, template, { orderNumber: order.orderNumber });
+  }
+}
+
+export async function assignDelivery(
+  orderId: string,
+  input: { staffId?: string; courierName?: string; trackingNumber?: string },
+) {
+  await requireRole(["ADMIN", "STAFF"]);
+
+  await prisma.deliveryAssignment.upsert({
+    where: { orderId },
+    update: {
+      staffId: input.staffId || undefined,
+      courierName: input.courierName || undefined,
+      trackingNumber: input.trackingNumber || undefined,
+    },
+    create: {
+      orderId,
+      staffId: input.staffId || undefined,
+      courierName: input.courierName || undefined,
+      trackingNumber: input.trackingNumber || undefined,
+    },
+  });
 }
 
 export async function confirmOrderPayment(

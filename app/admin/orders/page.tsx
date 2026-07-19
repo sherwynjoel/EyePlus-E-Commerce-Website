@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/db/client";
 import { Badge } from "@/components/ui/badge";
 import { formatInr } from "@/lib/utils/currency";
@@ -33,8 +34,12 @@ export default async function AdminOrdersPage() {
             </TableHeader>
             <TableBody>
               {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                <TableRow key={order.id} className="cursor-pointer hover:bg-muted/40">
+                  <TableCell className="font-medium">
+                    <Link href={`/admin/orders/${order.id}`} className="hover:underline">
+                      {order.orderNumber}
+                    </Link>
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{order.user.phone}</TableCell>
                   <TableCell><Badge variant="secondary">{order.status}</Badge></TableCell>
                   <TableCell className="text-right">{formatInr(order.grandTotal.toString())}</TableCell>

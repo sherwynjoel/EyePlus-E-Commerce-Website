@@ -8,6 +8,7 @@ import { addToCart, removeCartItem, updateCartItemQuantity } from "@/lib/service
 import { createAddressForCurrentUser } from "@/lib/services/address-service";
 import { createOrderFromCart, confirmOrderPayment, getOrderForCurrentUser } from "@/lib/services/order-service";
 import { createRazorpayOrder, verifyRazorpaySignature, isRazorpayConfigured } from "@/lib/payments/razorpay";
+import { requestReturn } from "@/lib/services/return-service";
 
 export async function addToCartAction(formData: FormData): Promise<void> {
   const session = await requireUser().catch(() => null);
@@ -139,4 +140,26 @@ export async function confirmPaymentAction(formData: FormData): Promise<void> {
   });
 
   redirect(`/checkout/success?orderId=${orderId}`);
+}
+
+export async function requestReturnAction(formData: FormData): Promise<void> {
+  await requireUser();
+  const orderItemId = String(formData.get("orderItemId") ?? "");
+  const orderId = String(formData.get("orderId") ?? "");
+  const reason = String(formData.get("reason") ?? "").trim();
+
+  if (!reason) {
+    redirect(`/account/returns/${orderItemId}?error=missing_reason`);
+  }
+
+  try {
+    await requestReturn(orderItemId, reason);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not request a return.";
+    redirect(`/account/returns/${orderItemId}?error=${encodeURIComponent(message)}`);
+  }
+
+  revalidatePath(`/account/orders/${orderId}`);
+  revalidatePath("/account/returns");
+  redirect(`/account/orders/${orderId}`);
 }

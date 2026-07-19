@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import { prisma } from "@/lib/db/client";
 import { EmptyState } from "@/components/shared/empty-state";
+import { Badge } from "@/components/ui/badge";
 import { formatInr } from "@/lib/utils/currency";
 import { ClipboardList } from "lucide-react";
 
@@ -27,13 +29,17 @@ export default async function DealerOrdersPage() {
       ) : (
         <div className="mt-6 divide-y divide-border/60 rounded-lg border border-border/60">
           {orders.map((order) => (
-            <div key={order.id} className="flex items-center justify-between px-4 py-4 text-sm">
+            <Link
+              key={order.id}
+              href={`/account/orders/${order.id}`}
+              className="flex items-center justify-between px-4 py-4 text-sm transition-colors hover:bg-muted/40"
+            >
               <div>
                 <p className="font-medium">{order.orderNumber}</p>
-                <p className="text-muted-foreground">{order.status}</p>
+                <Badge variant="secondary" className="mt-1">{order.status}</Badge>
               </div>
               <p className="font-medium">{formatInr(order.grandTotal.toString())}</p>
-            </div>
+            </Link>
           ))}
         </div>
       )}
