@@ -15,14 +15,15 @@ export async function addToCartAction(formData: FormData): Promise<void> {
   const variantId = String(formData.get("variantId") ?? "");
   const quantity = Math.max(1, Number(formData.get("quantity") ?? 1));
   const redirectTo = String(formData.get("redirectTo") ?? "");
+  const onSuccessRedirect = String(formData.get("onSuccessRedirect") ?? "") || "/cart";
 
   if (!session) {
     redirect(`/auth/login?next=${encodeURIComponent(redirectTo || "/cart")}`);
   }
 
   await addToCart(variantId, quantity);
-  revalidatePath("/cart");
-  redirect("/cart");
+  revalidatePath(onSuccessRedirect);
+  redirect(onSuccessRedirect);
 }
 
 export async function updateCartItemAction(formData: FormData): Promise<void> {

@@ -46,10 +46,19 @@ export async function createOrderFromCart(addressId: string, couponCode?: string
 
   const grandTotal = subtotal - discountTotal;
 
+  let dealerProfileId: string | undefined;
+  if (session.role === "DEALER") {
+    const dealerProfile = await prisma.dealerProfile.findUnique({ where: { userId: session.userId } });
+    if (dealerProfile?.approvalStatus === "APPROVED") {
+      dealerProfileId = dealerProfile.id;
+    }
+  }
+
   const order = await prisma.order.create({
     data: {
       orderNumber: generateOrderNumber(),
       userId: session.userId,
+      dealerProfileId,
       status: "PENDING",
       shippingAddressId: address.id,
       billingAddressId: address.id,
