@@ -72,7 +72,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 1rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -126,5 +126,47 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, minmax(160px, auto));
+    gap: 1.25rem;
+    grid-template-areas:
+      "hero hero hero tv1"
+      "hero hero hero tv2"
+      "promo cat  cat  tv3"
+      "promo tab  desk panel";
+  }
+  .bento-hero { grid-area: hero; }
+  .bento-promo { grid-area: promo; }
+  .bento-cat { grid-area: cat; }
+  .bento-tv1 { grid-area: tv1; }
+  .bento-tv2 { grid-area: tv2; }
+  .bento-tv3 { grid-area: tv3; }
+  .bento-tab { grid-area: tab; }
+  .bento-desk { grid-area: desk; }
+  .bento-panel { grid-area: panel; }
+
+  @media (max-width: 1024px) {
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-areas:
+        "hero  hero"
+        "tv1   tv2"
+        "promo promo"
+        "cat   cat"
+        "tv3   panel"
+        "tab   desk";
+    }
+  }
+  @media (max-width: 640px) {
+    .bento-grid {
+      grid-template-columns: 1fr;
+      grid-template-areas: "hero" "tv1" "tv2" "promo" "cat" "tv3" "panel" "tab" "desk";
+    }
   }
 }
