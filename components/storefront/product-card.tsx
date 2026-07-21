@@ -30,16 +30,21 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             <Tv className="size-16 text-muted-foreground/40" strokeWidth={1} />
           )}
         </div>
-        <CardContent className="space-y-1 px-4 pt-4">
-          <p className="text-xs text-muted-foreground">{product.brand ?? product.categoryName}</p>
-          <h3 className="line-clamp-2 text-sm font-medium leading-snug group-hover:underline">
+        <CardContent className="space-y-1.5 px-4 pt-4">
+          <p className="text-[10px] font-bold tracking-wide text-muted-foreground uppercase">
+            {product.brand ?? product.categoryName}
+          </p>
+          <h3 className="line-clamp-2 text-sm font-bold leading-snug group-hover:underline">
             {product.name}
           </h3>
         </CardContent>
         <CardFooter className="flex items-center gap-2 px-4 pb-4">
           {product.fromPrice != null ? (
             <>
-              <span className="text-base font-semibold">From {formatInr(product.fromPrice)}</span>
+              <span className="text-lg font-extrabold tabular-nums">
+                {hasDiscount ? "From " : ""}
+                {formatInr(product.fromPrice)}
+              </span>
               {hasDiscount ? (
                 <span className="text-xs text-muted-foreground line-through">{formatInr(product.mrp!)}</span>
               ) : null}

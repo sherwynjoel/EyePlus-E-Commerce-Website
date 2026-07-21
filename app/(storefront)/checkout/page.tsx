@@ -42,7 +42,7 @@ export default async function CheckoutPage({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Checkout</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight">Checkout</h1>
 
       {error ? (
         <p className="mt-4 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -112,7 +112,7 @@ export default async function CheckoutPage({
                 </div>
                 <div className="flex items-center justify-between border-t border-border/60 pt-4 text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-semibold">{formatInr(subtotal)}</span>
+                  <span className="text-lg font-extrabold tabular-nums">{formatInr(subtotal)}</span>
                 </div>
 
                 <div className="space-y-2">

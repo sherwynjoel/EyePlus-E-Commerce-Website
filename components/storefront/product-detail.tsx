@@ -57,13 +57,13 @@ export function ProductDetail({
       </div>
 
       <div>
-        <p className="text-sm text-muted-foreground">{brand ?? categoryName}</p>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight">{name}</h1>
+        <p className="text-[11px] font-bold tracking-wide text-muted-foreground uppercase">{brand ?? categoryName}</p>
+        <h1 className="mt-1 text-3xl font-extrabold tracking-tight text-balance">{name}</h1>
 
         <div className="mt-4 flex items-baseline gap-3">
           {selected?.sellingPrice != null ? (
             <>
-              <span className="text-2xl font-semibold">{formatInr(selected.sellingPrice)}</span>
+              <span className="text-3xl font-extrabold tabular-nums">{formatInr(selected.sellingPrice)}</span>
               {hasDiscount ? (
                 <span className="text-sm text-muted-foreground line-through">{formatInr(selected.mrp!)}</span>
               ) : null}
@@ -77,7 +77,7 @@ export function ProductDetail({
 
         {variants.length > 1 ? (
           <div className="mt-6">
-            <p className="text-sm font-medium">Choose an option</p>
+            <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">Choose an option</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {variants.map((variant) => {
                 const label = Object.values(variant.attributes)[0] ?? variant.sku;
@@ -86,10 +86,10 @@ export function ProductDetail({
                     key={variant.id}
                     type="button"
                     onClick={() => setSelectedId(variant.id)}
-                    className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
+                    className={`rounded-full px-4 py-2 text-xs font-bold transition-colors ${
                       variant.id === selected?.id
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border/60 hover:bg-muted/50"
+                        ? "bg-foreground text-background"
+                        : "bg-muted text-muted-foreground hover:bg-foreground hover:text-background"
                     }`}
                   >
                     {label}
@@ -100,7 +100,7 @@ export function ProductDetail({
           </div>
         ) : null}
 
-        <p className="mt-4 text-sm">
+        <p className="mt-4 text-sm font-semibold">
           {inStock ? (
             <span className="text-emerald-600 dark:text-emerald-500">In stock</span>
           ) : (

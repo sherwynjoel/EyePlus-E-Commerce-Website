@@ -104,7 +104,7 @@ export function CheckoutPayment({
         <CardDescription>Order {orderNumber}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-2xl font-semibold">{formatInr(amount)}</p>
+        <p className="text-3xl font-extrabold tabular-nums">{formatInr(amount)}</p>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
         {isConfigured ? (

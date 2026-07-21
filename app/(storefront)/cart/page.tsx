@@ -14,7 +14,7 @@ export default async function CartPage() {
   if (!session) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-semibold tracking-tight">Your cart</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight">Your cart</h1>
         <div className="mt-6 flex flex-col items-center gap-3 rounded-lg border border-dashed border-border/60 px-6 py-16 text-center">
           <ShoppingCart className="size-8 text-muted-foreground/50" strokeWidth={1.5} />
           <p className="font-medium">Log in to see your cart</p>
@@ -32,7 +32,7 @@ export default async function CartPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Your cart</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight">Your cart</h1>
 
       {items.length === 0 ? (
         <div className="mt-6">
@@ -65,7 +65,7 @@ export default async function CartPage() {
                         {item.variant.product.name}
                       </Link>
                       {label ? <p className="text-sm text-muted-foreground">{label}</p> : null}
-                      <p className="mt-1 text-sm font-medium">{formatInr(item.priceSnapshot.toString())}</p>
+                      <p className="mt-1 text-base font-extrabold tabular-nums">{formatInr(item.priceSnapshot.toString())}</p>
                     </div>
                     <form action={updateCartItemAction} className="flex items-center gap-2">
                       <input type="hidden" name="cartItemId" value={item.id} />
@@ -93,7 +93,7 @@ export default async function CartPage() {
               <CardContent className="space-y-4 py-6">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-semibold">{formatInr(subtotal)}</span>
+                  <span className="text-lg font-extrabold tabular-nums">{formatInr(subtotal)}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Taxes and shipping calculated at checkout.</p>
                 <Button className="w-full" size="lg" nativeButton={false} render={<Link href="/checkout" />}>
